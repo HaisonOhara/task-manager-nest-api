@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📝 API de Tarefas - Demo Front-end</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📝 Gerenciador de Tarefas</h1>
+            <p class="subtitle">Exemplo de integração Front-end + Back-end com NestJS</p>
+        </header>
+
+        <!-- Status da Conexão com API -->
+        <div id="api-status" class="status-box">
+            <span id="status-indicator">🔴</span>
+            <span id="status-text">Verificando conexão com API...</span>
+        </div>
+
+        <!-- Formulário para criar tarefa -->
+        <section class="card">
+            <h2>➕ Nova Tarefa</h2>
+            <form id="task-form">
+                <div class="form-group">
+                    <label for="title">Título *</label>
+                    <input type="text" id="title" required minlength="3" placeholder="Ex: Estudar NestJS">
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Descrição</label>
+                    <textarea id="description" rows="3" placeholder="Detalhes da tarefa (opcional)"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="category">Categoria</label>
+                    <select id="category">
+                        <option value="">Sem categoria</option>
+                        <!-- Categorias carregadas dinamicamente -->
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Criar Tarefa</button>
+            </form>
+        </section>
+
+        <!-- Filtros -->
+        <section class="filters">
+            <button class="btn btn-filter active" data-filter="all">Todas</button>
+            <button class="btn btn-filter" data-filter="pending">Pendentes</button>
+            <button class="btn btn-filter" data-filter="completed">Concluídas</button>
+            <button class="btn btn-secondary" id="refresh-btn">🔄 Atualizar</button>
+        </section>
+
+        <!-- Lista de Tarefas -->
+        <section class="card">
+            <h2>📋 Minhas Tarefas</h2>
+            <div id="tasks-container">
+                <div class="loading">Carregando tarefas...</div>
+            </div>
+        </section>
+
+        <!-- Estatísticas -->
+        <section class="stats">
+            <div class="stat-card">
+                <span class="stat-number" id="total-tasks">0</span>
+                <span class="stat-label">Total</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" id="pending-tasks">0</span>
+                <span class="stat-label">Pendentes</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" id="completed-tasks">0</span>
+                <span class="stat-label">Concluídas</span>
+            </div>
+        </section>
+
+        <footer>
+            <p>🚀 Feito com NestJS + TypeScript + PostgreSQL</p>
+            <p class="small">
+                <a href="http://localhost:3000" target="_blank">API Base URL</a> | 
+                <a href="http://localhost:3000/health" target="_blank">Health Check</a>
+            </p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

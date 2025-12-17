@@ -19,6 +19,45 @@
             <span id="status-text">Verificando conexão com API...</span>
         </div>
 
+        <!-- Formulário para criar categoria -->
+        <section class="card">
+            <h2>🏷️ Nova Categoria</h2>
+            <form id="category-form">
+                <div class="form-group">
+                    <label for="category-name">Nome *</label>
+                    <input type="text" id="category-name" required minlength="3" maxlength="30" placeholder="Ex: Trabalho, Estudos, Pessoal">
+                </div>
+
+                <div class="form-group">
+                    <label for="category-description">Descrição</label>
+                    <textarea id="category-description" rows="2" placeholder="Descrição da categoria (opcional)"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="category-color">Cor</label>
+                    <div class="color-picker-container">
+                        <input type="color" id="category-color" value="#9E9E9E">
+                        <input type="text" id="category-color-text" value="#9E9E9E" pattern="^#[0-9A-Fa-f]{6}$" placeholder="#9E9E9E">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Criar Categoria</button>
+            </form>
+        </section>
+
+        <!-- Lista de Categorias -->
+        <section class="card">
+            <div class="section-header">
+                <h2>🏷️ Categorias</h2>
+                <button class="btn btn-secondary btn-small" id="toggle-categories">
+                    <span id="toggle-icon">▼</span> Mostrar/Ocultar
+                </button>
+            </div>
+            <div id="categories-list" class="categories-list" style="display: none;">
+                <div class="loading">Carregando categorias...</div>
+            </div>
+        </section>
+
         <!-- Formulário para criar tarefa -->
         <section class="card">
             <h2>➕ Nova Tarefa</h2>

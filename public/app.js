@@ -8,10 +8,15 @@ let currentFilter = 'all';
 
 // Elementos do DOM
 const taskForm = document.getElementById('task-form');
+const categoryForm = document.getElementById('category-form');
 const tasksContainer = document.getElementById('tasks-container');
+const categoriesListContainer = document.getElementById('categories-list');
 const categorySelect = document.getElementById('category');
 const filterButtons = document.querySelectorAll('.btn-filter');
 const refreshBtn = document.getElementById('refresh-btn');
+const toggleCategoriesBtn = document.getElementById('toggle-categories');
+const categoryColorInput = document.getElementById('category-color');
+const categoryColorTextInput = document.getElementById('category-color-text');
 
 // Inicializa a aplicação
 async function init() {
@@ -26,7 +31,21 @@ async function init() {
     
     // Event listeners
     taskForm.addEventListener('submit', handleCreateTask);
+    categoryForm.addEventListener('submit', handleCreateCategory);
     refreshBtn.addEventListener('click', handleRefresh);
+    toggleCategoriesBtn.addEventListener('click', toggleCategoriesList);
+    
+    // Sincroniza o color picker com o input de texto
+    categoryColorInput.addEventListener('input', (e) => {
+        categoryColorTextInput.value = e.target.value.toUpperCase();
+    });
+    
+    categoryColorTextInput.addEventListener('input', (e) => {
+        const value = e.target.value;
+        if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
+            categoryColorInput.value = value;
+        }
+    });
     
     filterButtons.forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -81,10 +100,58 @@ async function loadCategories() {
             categorySelect.appendChild(option);
         });
         
+        // Renderiza a lista de categorias
+        renderCategories();
+        
         console.log('📂 Categorias carregadas:', categories.length);
     } catch (error) {
         console.error('❌ Erro ao carregar categorias:', error);
         showMessage('Erro ao carregar categorias', 'error');
+    }
+}
+
+// Renderiza lista de categorias
+function renderCategories() {
+    if (categories.length === 0) {
+        categoriesListContainer.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">🏷️</div>
+                <p>Nenhuma categoria criada</p>
+            </div>
+        `;
+        return;
+    }
+    
+    categoriesListContainer.innerHTML = categories.map(cat => `
+        <div class="category-item" style="border-left-color: ${cat.color}">
+            <div class="category-content">
+                <div class="category-header">
+                    <span class="category-color-badge" style="background-color: ${cat.color}"></span>
+                    <span class="category-name">${escapeHtml(cat.name)}</span>
+                </div>
+                ${cat.description ? `<div class="category-description">${escapeHtml(cat.description)}</div>` : ''}
+                <div class="category-meta">
+                    <span>📅 ${formatDate(cat.createdAt)}</span>
+                </div>
+            </div>
+            <div class="category-actions">
+                <button class="btn-delete-category" onclick="deleteCategory('${cat.id}')">🗑 Deletar</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Toggle da lista de categorias
+function toggleCategoriesList() {
+    const list = document.getElementById('categories-list');
+    const icon = document.getElementById('toggle-icon');
+    
+    if (list.style.display === 'none') {
+        list.style.display = 'block';
+        icon.textContent = '▲';
+    } else {
+        list.style.display = 'none';
+        icon.textContent = '▼';
     }
 }
 
@@ -207,6 +274,48 @@ async function handleCreateTask(e) {
     }
 }
 
+// Cria nova categoria
+async function handleCreateCategory(e) {
+    e.preventDefault();
+    
+    const name = document.getElementById('category-name').value;
+    const description = document.getElementById('category-description').value;
+    const color = document.getElementById('category-color').value;
+    
+    const categoryData = {
+        name,
+        description: description || undefined,
+        color: color || '#9E9E9E'
+    };
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/categories`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(categoryData)
+        });
+        
+        if (response.ok) {
+            const newCategory = await response.json();
+            console.log('✅ Categoria criada:', newCategory);
+            
+            showMessage('Categoria criada com sucesso!', 'success');
+            categoryForm.reset();
+            document.getElementById('category-color').value = '#9E9E9E';
+            document.getElementById('category-color-text').value = '#9E9E9E';
+            await loadCategories(); // Recarrega lista
+        } else {
+            const error = await response.json();
+            showMessage(`Erro: ${error.message}`, 'error');
+        }
+    } catch (error) {
+        console.error('❌ Erro ao criar categoria:', error);
+        showMessage('Erro ao criar categoria. Verifique sua conexão.', 'error');
+    }
+}
+
 // Marca/desmarca tarefa como concluída
 async function toggleTask(taskId, completed) {
     try {
@@ -251,6 +360,31 @@ async function deleteTask(taskId) {
     } catch (error) {
         console.error('❌ Erro ao deletar tarefa:', error);
         showMessage('Erro ao deletar tarefa', 'error');
+    }
+}
+
+// Deleta categoria
+async function deleteCategory(categoryId) {
+    if (!confirm('Tem certeza que deseja deletar esta categoria? As tarefas associadas não serão deletadas.')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/categories/${categoryId}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok || response.status === 204) {
+            console.log('✅ Categoria deletada');
+            showMessage('Categoria deletada com sucesso!', 'success');
+            await loadCategories();
+            await loadTasks(); // Recarrega tarefas para atualizar as que tinham essa categoria
+        } else {
+            showMessage('Erro ao deletar categoria', 'error');
+        }
+    } catch (error) {
+        console.error('❌ Erro ao deletar categoria:', error);
+        showMessage('Erro ao deletar categoria', 'error');
     }
 }
 

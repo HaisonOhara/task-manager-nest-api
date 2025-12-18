@@ -325,7 +325,7 @@ Após dominar este exemplo, você pode:
 - [Documentação Oficial do NestJS](https://docs.nestjs.com)
 - [NestJS Fundamentals Course](https://learn.nestjs.com)
 - [GitHub do NestJS](https://github.com/nestjs/nest)
-
+- [Git](https://git-scm.com/)
 ## 📄 Licença
 
 MIT
